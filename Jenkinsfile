@@ -5,10 +5,6 @@ pipeline {
         cron('H/5 * * * 1')
     }
 
-    tools {
-        maven 'Maven3'   // Make sure Maven3 is configured in Jenkins
-    }
-
     stages {
 
         stage('Checkout') {
@@ -19,25 +15,25 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                bat 'mvnw.cmd clean compile'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                bat 'mvnw.cmd test'
             }
         }
 
         stage('Code Coverage - JaCoCo') {
             steps {
-                sh 'mvn jacoco:report'
+                bat 'mvnw.cmd jacoco:report'
             }
         }
 
         stage('Package Artifact') {
             steps {
-                sh 'mvn package -DskipTests'
+                bat 'mvnw.cmd package -DskipTests'
             }
         }
     }
@@ -46,14 +42,6 @@ pipeline {
         always {
             junit '**/target/surefire-reports/*.xml'
             archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'target/site/jacoco',
-                reportFiles: 'index.html',
-                reportName: 'JaCoCo Coverage Report'
-            ])
         }
     }
 }
